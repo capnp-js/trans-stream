@@ -13,6 +13,9 @@ import {
 
 import writeCountSection from "./state/writeCountSection";
 import writeLengthsSection from "./state/writeLengthsSection";
+// #if _DEBUG
+import { debugState } from "./state/main";
+// #endif
 import {
   COUNT_SECTION_STATE,
   COUNT_SECTION,
@@ -21,7 +24,7 @@ import {
 export default class StartCore {
   +buffer: Uint8Array;
   +segments: $ReadOnlyArray<Uint8Array>;
-  state: State;
+  state: null | State;
 
   constructor(buffer: Uint8Array, segments: $ReadOnlyArray<Uint8Array>) {
     if (buffer.length < ENCODE_MIN_BUFFER_SIZE) {
@@ -42,29 +45,36 @@ export default class StartCore {
   }
 
   next(): SugarlessIteratorResult<Uint8Array> {
+    // #if _DEBUG
+    console.log("\n***** next() beginning *****");
+    if (this.state === null) {
+      console.log("null state");
+    } else {
+      console.log(`${debugState(this.state)}`);
+    }
+    // #endif
+
     const chunk = {
       buffer: this.buffer,
       i: 0,
     };
 
-    let nextState;
-    switch (this.state.type) {
-    case COUNT_SECTION:
-      nextState = writeCountSection(this.segments, chunk);
-      break;
-    default:
-      (this.state: LengthsSection);
-      nextState = writeLengthsSection(this.segments, this.state, chunk);
-    }
+    if (this.state === null) {
+      return { done: true };
+    } else {
+      switch (this.state.type) {
+      case COUNT_SECTION:
+        this.state = writeCountSection(this.segments, chunk);
+        break;
+      default:
+        (this.state: LengthsSection);
+        this.state = writeLengthsSection(this.segments, this.state, chunk);
+      }
 
-    if (nextState !== null) {
-      this.state = nextState;
       return {
         done: false,
         value: chunk.buffer.subarray(0, chunk.i),
       };
-    } else {
-      return { done: true };
     }
   }
 }

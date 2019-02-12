@@ -4,9 +4,9 @@ export type State = CountSection | LengthsSection;
 
 export const COUNT_SECTION = "count section";
 
-export type CountSection = {|
+export type CountSection = {
   +type: "count section",
-|};
+};
 
 export const COUNT_SECTION_STATE = {
   type: COUNT_SECTION,
@@ -16,10 +16,10 @@ type u32 = number;
 
 export const LENGTHS_SECTION = "lengths section";
 
-export type LengthsSection = {|
+export type LengthsSection = {
   +type: "lengths section",
   i: u32,
-|};
+};
 
 // #if _DEBUG
 export function debugState(state: State): string {
@@ -28,7 +28,7 @@ export function debugState(state: State): string {
     return `state="${COUNT_SECTION}"`;
   default:
     (state: LengthsSection);
-    return `state="${LENGTHS_SECTION}" with {state.i} lengths currently output`;
+    return `state="${LENGTHS_SECTION}" with ${state.i} lengths currently output`;
   }
 }
 // #endif

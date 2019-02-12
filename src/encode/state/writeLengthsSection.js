@@ -13,7 +13,7 @@ export default function writeLengthsSection(segments: Segments, state: LengthsSe
   const remainingBytes = chunk.buffer.length - chunk.i;
   const end = Math.min(remainingBytes, lengthsEnd);
   for ( ; chunk.i<end; chunk.i+=4) {
-    uint32(this.segments[state.i++].length, chunk.buffer, chunk.i);
+    uint32(segments[state.i++].length / 8, chunk.buffer, chunk.i);
   }
 
   if (state.i < segments.length) {

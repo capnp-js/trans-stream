@@ -16,7 +16,8 @@ export default function writeCountSection(segments: Segments, chunk: Cursor): St
   chunk.i += 4;
 
   /* Get word aligned again. */
-  uint32(segments[0].length, chunk.buffer, chunk.i);
+  uint32(segments[0].length / 8, chunk.buffer, chunk.i);
+  chunk.i += 4;
 
   /* I've already processed the first segment length, so the state's position
      starts at 1 instead of 0. */
