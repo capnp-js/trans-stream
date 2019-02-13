@@ -17,14 +17,14 @@ export default function readLengthsSection(state: LengthsSection, chunk: Cursor)
     console.log(`header prescribes a segment length of ${uint32(chunk.buffer, chunk.i)} words`);
     // #endif
 
-    state.segmentLengths[state.i++] = 8 * uint32(chunk.buffer, chunk.i);
+    state.segmentLengths[state.i++] = uint32(chunk.buffer, chunk.i);
   }
 
   if (state.i === state.segmentLengths.length) {
     /* I've transitioned state. I may not have reached the end of the `chunk`
        buffer, so I write segments just in case. */
 
-    if ((state.segmentLengths.length & 0x01) === 0) {
+    if ((state.segmentLengths.length % 2) === 0) {
       /* A count u32 plus a word aligned lengths section implies that the
          `chunk` position is not word aligned, so skip 4 bytes of padding. */
 
@@ -35,10 +35,14 @@ export default function readLengthsSection(state: LengthsSection, chunk: Cursor)
       chunk.i += 4;
     }
 
+    const segments = [];
+    state.segmentLengths.forEach(words => {
+      segments.push(new Uint8Array(8 * words));
+    });
     return writeSegmentsSection({
       type: SEGMENTS_SECTION,
       segmentLengths: state.segmentLengths,
-      segments: [ new Uint8Array(state.segmentLengths[0]) ],
+      segments,
       segmentI: 0,
       i: 0,
     }, chunk);

@@ -70,7 +70,7 @@ export default class FinishCore {
       const count = this.state.segmentLengths.length;
       if (segmentI === count - 1) {
         const i = this.state.i;
-        if (i === this.state.segmentLengths[segmentI]) {
+        if (i === 8 * this.state.segmentLengths[segmentI]) {
           return this.state.segments;
         }
       }

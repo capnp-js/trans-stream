@@ -39,13 +39,13 @@ export function debugState(state: State): string {
   case COUNT_SECTION:
     return `state="${COUNT_SECTION}"`;
   case LENGTHS_SECTION:
-    return `state="${LENGTHS_SECTION}" with {state.i} of ${state.segmentLengths.length} lengths`;
+    return `state="${LENGTHS_SECTION}" with ${state.i} of ${state.segmentLengths.length} lengths`;
   default: {
     (state: SegmentsSection);
 
     const segmentI = state.segmentI;
     const segmentsS = `${segmentI} of ${state.segmentLengths.length} segments`;
-    const segmentS = `${state.i} of ${state.segmentLengths[segmentI]} bytes`;
+    const segmentS = `${state.i} of ${8 * state.segmentLengths[segmentI]} bytes`;
 
     return `state="${SEGMENTS_SECTION}" with ${segmentsS} and ${segmentS}`;
   }

@@ -6,7 +6,16 @@ import type { SegmentsSection } from "./main";
 
 import { DECODE_OVERFLOW_ERROR } from "../constant";
 
+// #if _DEBUG
+import { debugState } from "./main";
+// #endif
+
 export default function writeSegmentsSection(state: SegmentsSection, chunk: Cursor): Error | SegmentsSection {
+  // #if _DEBUG
+  console.log("\n***** writeSegmentsSection(state, chunk) beginning *****");
+  console.log(`${debugState(state)}`);
+  // #endif
+
   let remainingBytes = chunk.buffer.length - chunk.i;
   let segment = state.segments[state.segmentI];
   let availableBytes = segment.length - state.i;
@@ -22,9 +31,8 @@ export default function writeSegmentsSection(state: SegmentsSection, chunk: Curs
     remainingBytes -= availableBytes;
 
     if (state.segmentI < state.segmentLengths.length - 1) {
-      availableBytes = state.segmentLengths[++state.segmentI];
-      segment = new Uint8Array(availableBytes);
-      state.segments.push(segment);
+      availableBytes = 8 * state.segmentLengths[++state.segmentI];
+      segment = state.segments[state.segmentI];
       state.i = 0;
     } else {
       /* I'm out of segments. Any remaining bytes don't have a segment to

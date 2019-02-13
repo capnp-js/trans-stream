@@ -25,6 +25,7 @@ export default function readCountSection(chunk: Cursor): Error | State {
   console.log(`header prescribes ${count} segment(s)`);
   // #endif
 
+  //TODO: Should I throw if the length of the first segment is less than 8?
   const state = {
     type: LENGTHS_SECTION,
     segmentLengths: new Uint32Array(count),

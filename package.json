@@ -43,8 +43,9 @@
     "rollup": "^0.68.1"
   },
   "dependencies": {
-    "@capnp-js/write-data": "^0.4.0",
-    "@capnp-js/transform": "^0.4.0"
+    "@capnp-js/read-data": "^0.4.0",
+    "@capnp-js/transform": "^0.4.0",
+    "@capnp-js/write-data": "^0.4.0"
   },
   "babel": {
     "presets": [
