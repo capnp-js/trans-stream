@@ -1,15 +1,15 @@
 /* @flow */
 
-import type { Cursor } from "../../common";
+import type { BytesR } from "@capnp-js/bytes";
 
-import type { State } from "./main";
+import type { Cursor, State } from "./main";
 
 import { uint32 } from "@capnp-js/write-data";
 
 import writeLengthsSection from "./writeLengthsSection";
 import { LENGTHS_SECTION } from "./main";
 
-type Segments = $ReadOnlyArray<Uint8Array>;
+type Segments = $ReadOnlyArray<BytesR>;
 
 export default function writeCountSection(segments: Segments, chunk: Cursor): State | null {
   uint32(segments.length - 1, chunk.buffer, chunk.i);

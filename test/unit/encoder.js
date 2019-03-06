@@ -2,6 +2,7 @@
 
 import * as assert from "assert";
 import { describe, it } from "mocha";
+import { create } from "@capnp-js/bytes";
 import { uint32 } from "@capnp-js/read-data";
 import { nonnull } from "@capnp-js/nullary";
 
@@ -10,15 +11,15 @@ import writeCountSection from "../../src/encode/state/writeCountSection";
 import writeLengthsSection from "../../src/encode/state/writeLengthsSection";
 import { LENGTHS_SECTION } from "../../src/encode/state/main";
 
-const oddSegments = [ new Uint8Array(32), new Uint8Array(8), new Uint8Array(24) ];
+const oddSegments = [ create(32), create(8), create(24) ];
 const evenSegments = oddSegments.slice(0);
-evenSegments.push(new Uint8Array(64));
+evenSegments.push(create(64));
 
 describe("writeCountSection", function () {
   it("writes the segment count minus one to the leading 4 bytes", function () {
     {
       const chunk = {
-        buffer: new Uint8Array(8),
+        buffer: create(8),
         i: 0,
       };
       writeCountSection(oddSegments, chunk);
@@ -27,7 +28,7 @@ describe("writeCountSection", function () {
 
     {
       const chunk = {
-        buffer: new Uint8Array(8),
+        buffer: create(8),
         i: 0,
       };
       writeCountSection(evenSegments, chunk);
@@ -38,7 +39,7 @@ describe("writeCountSection", function () {
   it("transitions to the lengths section", function () {
     {
       const chunk = {
-        buffer: new Uint8Array(8),
+        buffer: create(8),
         i: 0,
       };
       const state = writeCountSection(oddSegments, chunk);
@@ -47,7 +48,7 @@ describe("writeCountSection", function () {
 
     {
       const chunk = {
-        buffer: new Uint8Array(8),
+        buffer: create(8),
         i: 0,
       };
       const state = writeCountSection(evenSegments, chunk);
@@ -60,7 +61,7 @@ describe("writeLengthsSection", function () {
   it("writes segment lengths", function () {
     {
       const chunk = {
-        buffer: new Uint8Array(8),
+        buffer: create(8),
         i: 0,
       };
       const state = writeLengthsSection(oddSegments, { type: LENGTHS_SECTION, i: 1 }, chunk);
@@ -72,7 +73,7 @@ describe("writeLengthsSection", function () {
 
     {
       const chunk = {
-        buffer: new Uint8Array(8),
+        buffer: create(8),
         i: 0,
       };
       let state = writeLengthsSection(evenSegments, { type: LENGTHS_SECTION, i: 1 }, chunk);
@@ -92,7 +93,7 @@ describe("writeLengthsSection", function () {
   it("zero pads even segment counts", function () {
     {
       const chunk = {
-        buffer: new Uint8Array(24),
+        buffer: create(24),
         i: 0,
       };
       let state = writeLengthsSection(evenSegments, { type: LENGTHS_SECTION, i: 1 }, chunk);
@@ -108,20 +109,20 @@ describe("writeLengthsSection", function () {
 
 describe("StartCore", function () {
   it("rejects insufficiently sized buffers", function () {
-    assert.throws(() => new StartCore(new Uint8Array(0), oddSegments));
+    assert.throws(() => new StartCore(create(0), oddSegments));
   });
 
   it("rejects buffers with lengths that are not some multiple of 8", function () {
-    assert.throws(() => new StartCore(new Uint8Array(9), oddSegments));
+    assert.throws(() => new StartCore(create(9), oddSegments));
   });
 
   it("rejects segment counts of 0", function () {
-    assert.throws(() => new StartCore(new Uint8Array(16), []));
+    assert.throws(() => new StartCore(create(16), []));
   });
 
   describe("next", function () {
     describe("odd segments", function () {
-      const core = new StartCore(new Uint8Array(8), oddSegments);
+      const core = new StartCore(create(8), oddSegments);
       let i = core.next();
       let value = (i: any).value;
       it("exposes segment count", function () {
@@ -143,7 +144,7 @@ describe("StartCore", function () {
     });
 
     describe("even segments", function () {
-      const core = new StartCore(new Uint8Array(8), evenSegments);
+      const core = new StartCore(create(8), evenSegments);
       let i = core.next();
       let value = (i: any).value;
       it("exposes segment count", function () {

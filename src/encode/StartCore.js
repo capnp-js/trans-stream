@@ -1,8 +1,11 @@
 /* @flow */
 
+import type { BytesR, BytesB } from "@capnp-js/bytes";
 import type { SugarlessIteratorResult } from "@capnp-js/transform";
 
 import type { State, LengthsSection } from "./state/main";
+
+import { getSubarray } from "@capnp-js/bytes";
 
 import {
   ENCODE_MIN_BUFFER_SIZE,
@@ -21,12 +24,14 @@ import {
   COUNT_SECTION,
 } from "./state/main";
 
+type Segments = $ReadOnlyArray<BytesR>;
+
 export default class StartCore {
-  +buffer: Uint8Array;
-  +segments: $ReadOnlyArray<Uint8Array>;
+  +buffer: BytesB;
+  +segments: Segments;
   state: null | State;
 
-  constructor(buffer: Uint8Array, segments: $ReadOnlyArray<Uint8Array>) {
+  constructor(buffer: BytesB, segments: Segments) {
     if (buffer.length < ENCODE_MIN_BUFFER_SIZE) {
       throw new Error(ENCODE_BUFFER_SIZE_ERROR);
     }
@@ -44,7 +49,7 @@ export default class StartCore {
     this.state = COUNT_SECTION_STATE;
   }
 
-  next(): SugarlessIteratorResult<Uint8Array> {
+  next(): SugarlessIteratorResult<BytesR> {
     // #if _DEBUG
     console.log("\n***** next() beginning *****");
     if (this.state === null) {
@@ -73,7 +78,7 @@ export default class StartCore {
 
       return {
         done: false,
-        value: chunk.buffer.subarray(0, chunk.i),
+        value: getSubarray(0, chunk.i, chunk.buffer),
       };
     }
   }

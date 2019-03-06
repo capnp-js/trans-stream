@@ -1,5 +1,7 @@
 /* @flow */
 
+import type { BytesR, BytesB } from "@capnp-js/bytes";
+
 import type { State, SegmentsSection } from "./state/main";
 
 import readCountSection from "./state/readCountSection";
@@ -23,7 +25,7 @@ export default class FinishCore {
     this.state = COUNT_SECTION_STATE;
   }
 
-  set(buffer: Uint8Array): true | Error {
+  set(buffer: BytesR): true | Error {
     // #if _DEBUG
     console.log("\n***** set(buffer) beginning *****");
     console.log(`${debugState(this.state)}`);
@@ -55,7 +57,7 @@ export default class FinishCore {
     }
   }
 
-  finish(): Array<Uint8Array> | Error {
+  finish(): Array<BytesB> | Error {
     // #if _DEBUG
     console.log("\n***** finish() beginning *****");
     console.log(`${debugState(this.state)}`);

@@ -1,7 +1,10 @@
 /* @flow */
 
+import type { BytesR } from "@capnp-js/bytes";
+
 import * as assert from "assert";
 import { describe, it } from "mocha";
+import { create, fill, set, getSubarray } from "@capnp-js/bytes";
 import { uint32 } from "@capnp-js/write-data";
 
 import FinishCore from "../../src/decode/FinishCore";
@@ -12,7 +15,7 @@ import { LENGTHS_SECTION, SEGMENTS_SECTION } from "../../src/decode/state/main";
 
 describe("readCountSection", function () {
   const chunk = {
-    buffer: new Uint8Array(8),
+    buffer: create(8),
     i: 0,
   };
   uint32(2, chunk.buffer, 0);
@@ -31,7 +34,7 @@ describe("readCountSection", function () {
 describe("readLengthsSection", function () {
   describe("odd segment count", function () {
     const chunk = {
-      buffer: new Uint8Array(8),
+      buffer: create(8),
       i: 0,
     };
     uint32(7, chunk.buffer, 0);
@@ -57,7 +60,7 @@ describe("readLengthsSection", function () {
 
   describe("even segment count", function () {
     const chunk = {
-      buffer: new Uint8Array(8),
+      buffer: create(8),
       i: 0,
     };
     let state = {
@@ -96,7 +99,7 @@ describe("writeSegmentsSection", function () {
   let state = {
     type: SEGMENTS_SECTION,
     segmentLengths: new Uint32Array(3),
-    segments: [ new Uint8Array(24), new Uint8Array(40), new Uint8Array(8) ],
+    segments: [ create(24), create(40), create(8) ],
     segmentI: 0,
     i: 0,
   };
@@ -105,10 +108,10 @@ describe("writeSegmentsSection", function () {
   state.segmentLengths[2] = 1;
 
   const chunk = {
-    buffer: new Uint8Array(16),
+    buffer: create(16),
     i: 0,
   };
-  chunk.buffer.fill(0xff);
+  fill(0xff, 0, chunk.buffer.length, chunk.buffer);
   it("advances segments section state for each chunk", function () {
     state = writeSegmentsSection((state: any), chunk);
     assert.equal((state: any).segmentI, 0);
@@ -155,23 +158,23 @@ describe("writeSegmentsSection", function () {
 });
 
 describe("FinishCore", function () {
-  const buffer = new Uint8Array(16);
+  const buffer = create(16);
   for (let i=0; i<16; ++i) {
-    buffer[i] = i;
+    set(i, i, buffer);
   }
 
   describe("even segment count with trivial finish", function () {
     const core = new FinishCore();
-    const header = new Uint8Array(24);
+    const header = create(24);
     uint32(4-1, header, 0);
     uint32(5, header, 4);
     uint32(7, header, 8);
     uint32(2, header, 12);
     uint32(12, header, 16);
 
-    assert.ok(core.set(header.subarray(0, 8)));
-    assert.ok(core.set(header.subarray(8, 16)));
-    assert.ok(core.set(header.subarray(16, 24)));
+    assert.ok(core.set(getSubarray(0, 8, header)));
+    assert.ok(core.set(getSubarray(8, 16, header)));
+    assert.ok(core.set(getSubarray(16, 24, header)));
 
     it("sets buffers successfully", function () {
       for (let i=0; i<5+7+2+12; i+=2) {
@@ -199,16 +202,16 @@ describe("FinishCore", function () {
 
   describe("even segment count with non-trivial finish", function () {
     const core = new FinishCore();
-    const header = new Uint8Array(24);
+    const header = create(24);
     uint32(4-1, header, 0);
     uint32(5, header, 4);
     uint32(7, header, 8);
     uint32(13, header, 12);
     uint32(1, header, 16);
 
-    assert.ok(core.set(header.subarray(0, 8)));
-    assert.ok(core.set(header.subarray(8, 16)));
-    assert.ok(core.set(header.subarray(16, 24)));
+    assert.ok(core.set(getSubarray(0, 8, header)));
+    assert.ok(core.set(getSubarray(8, 16, header)));
+    assert.ok(core.set(getSubarray(16, 24, header)));
 
     it("sets buffers successfully", function () {
       for (let i=0; i<5+7+13+1; i+=2) {
@@ -236,14 +239,14 @@ describe("FinishCore", function () {
 
   describe("odd segment count with trivial finish", function () {
     const core = new FinishCore();
-    const header = new Uint8Array(16);
+    const header = create(16);
     uint32(3-1, header, 0);
     uint32(5, header, 4);
     uint32(7, header, 8);
     uint32(2, header, 12);
 
-    assert.ok(core.set(header.subarray(0, 8)));
-    assert.ok(core.set(header.subarray(8, 16)));
+    assert.ok(core.set(getSubarray(0, 8, header)));
+    assert.ok(core.set(getSubarray(8, 16, header)));
 
     it("sets buffers successfully", function () {
       for (let i=0; i<5+7+2; i+=2) {
@@ -268,14 +271,14 @@ describe("FinishCore", function () {
 
   describe("odd segment count with non-trivial finish", function () {
     const core = new FinishCore();
-    const header = new Uint8Array(16);
+    const header = create(16);
     uint32(3-1, header, 0);
     uint32(5, header, 4);
     uint32(7, header, 8);
     uint32(1, header, 12);
 
-    assert.ok(core.set(header.subarray(0, 8)));
-    assert.ok(core.set(header.subarray(8, 16)));
+    assert.ok(core.set(getSubarray(0, 8, (header: BytesR))));
+    assert.ok(core.set(getSubarray(8, 16, (header: BytesR))));
 
     it("sets buffers successfully", function () {
       for (let i=0; i<5+7+1; i+=2) {

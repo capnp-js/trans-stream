@@ -1,5 +1,14 @@
 /* @flow */
 
+import type { BytesB } from "@capnp-js/bytes";
+
+type uint = number;
+
+export type Cursor = {
+  buffer: BytesB,
+  i: uint,
+};
+
 export type State = CountSection | LengthsSection;
 
 export const COUNT_SECTION = "count section";

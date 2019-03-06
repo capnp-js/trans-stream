@@ -1,7 +1,15 @@
 /* @flow */
 
+import type { BytesR, BytesB } from "@capnp-js/bytes";
+
+type uint = number;
 type u32 = number;
 type u35 = number;
+
+export type Cursor = {
+  buffer: BytesR,
+  i: uint,
+};
 
 export type State = CountSection | LengthsSection | SegmentsSection;
 
@@ -28,7 +36,7 @@ export const SEGMENTS_SECTION = "segments section";
 export type SegmentsSection = {|
   +type: "segments section",
   +segmentLengths: Uint32Array,
-  +segments: Array<Uint8Array>,
+  +segments: Array<BytesB>,
   segmentI: u32,
   i: u35,
 |};

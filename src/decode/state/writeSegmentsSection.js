@@ -1,8 +1,8 @@
 /* @flow */
 
-import type { Cursor } from "../../common";
+import type { Cursor, SegmentsSection } from "./main";
 
-import type { SegmentsSection } from "./main";
+import { getSubarray, setSubarray } from "@capnp-js/bytes";
 
 import { DECODE_OVERFLOW_ERROR } from "../constant";
 
@@ -26,7 +26,7 @@ export default function writeSegmentsSection(state: SegmentsSection, chunk: Curs
     console.log(`found the end of segment ${state.i}`);
     // #endif
 
-    segment.set(chunk.buffer.subarray(chunk.i, chunk.i + availableBytes), state.i);
+    setSubarray(getSubarray(chunk.i, chunk.i + availableBytes, chunk.buffer), state.i, segment);
     chunk.i += availableBytes;
     remainingBytes -= availableBytes;
 
@@ -51,7 +51,7 @@ export default function writeSegmentsSection(state: SegmentsSection, chunk: Curs
     }
   }
 
-  segment.set(chunk.buffer.subarray(chunk.i), state.i);
+  setSubarray(getSubarray(chunk.i, chunk.buffer.length, chunk.buffer), state.i, segment);
   state.i += remainingBytes;
 
   return state;

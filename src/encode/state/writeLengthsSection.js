@@ -1,12 +1,13 @@
 /* @flow */
 
-import type { Cursor } from "../../common";
+import type { BytesR } from "@capnp-js/bytes";
 
-import type { LengthsSection } from "./main";
+import type { Cursor, LengthsSection } from "./main";
 
+import { set } from "@capnp-js/bytes";
 import { uint32 } from "@capnp-js/write-data";
 
-type Segments = $ReadOnlyArray<Uint8Array>;
+type Segments = $ReadOnlyArray<BytesR>;
 
 export default function writeLengthsSection(segments: Segments, state: LengthsSection, chunk: Cursor): LengthsSection | null {
   const lengthsEnd = 4 * (segments.length - state.i);
@@ -23,10 +24,10 @@ export default function writeLengthsSection(segments: Segments, state: LengthsSe
     /* I've found the end of the lengths section. */
     if (chunk.i % 8) {
       /* Pad the lengths section with zeros if it's not word aligned. */
-      chunk.buffer[chunk.i++] = 0;
-      chunk.buffer[chunk.i++] = 0;
-      chunk.buffer[chunk.i++] = 0;
-      chunk.buffer[chunk.i++] = 0;
+      set(0, chunk.i++, chunk.buffer);
+      set(0, chunk.i++, chunk.buffer);
+      set(0, chunk.i++, chunk.buffer);
+      set(0, chunk.i++, chunk.buffer);
     }
 
     return null;

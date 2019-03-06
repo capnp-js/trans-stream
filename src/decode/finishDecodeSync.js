@@ -1,10 +1,11 @@
 /* @flow */
 
+import type { BytesR, BytesB } from "@capnp-js/bytes";
 import type { SugarlessIterator, Finish } from "@capnp-js/transform";
 
 import FinishCore from "./FinishCore";
 
-export default function finish(source: SugarlessIterator<Uint8Array>): Array<Uint8Array> | Error {
+export default function finish(source: SugarlessIterator<BytesR>): Array<BytesB> | Error {
   const core = new FinishCore();
 
   let s = source.next();
@@ -23,5 +24,4 @@ export default function finish(source: SugarlessIterator<Uint8Array>): Array<Uin
     return s.done;
   }
 }
-
-(finish: Finish<Uint8Array, Array<Uint8Array> | Error>);
+(finish: Finish<BytesR, Array<BytesB> | Error>);

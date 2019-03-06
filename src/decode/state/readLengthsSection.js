@@ -1,9 +1,8 @@
 /* @flow */
 
-import type { Cursor } from "../../common";
+import type { Cursor, LengthsSection, SegmentsSection } from "./main";
 
-import type { LengthsSection, SegmentsSection } from "./main";
-
+import { create } from "@capnp-js/bytes";
 import { uint32 } from "@capnp-js/read-data";
 
 import writeSegmentsSection from "./writeSegmentsSection";
@@ -37,7 +36,7 @@ export default function readLengthsSection(state: LengthsSection, chunk: Cursor)
 
     const segments = [];
     state.segmentLengths.forEach(words => {
-      segments.push(new Uint8Array(8 * words));
+      segments.push(create(8 * words));
     });
     return writeSegmentsSection({
       type: SEGMENTS_SECTION,

@@ -1,8 +1,6 @@
 /* @flow */
 
-import type { Cursor } from "../../common";
-
-import type { State } from "./main";
+import type { Cursor, State } from "./main";
 
 import { uint32 } from "@capnp-js/read-data";
 
